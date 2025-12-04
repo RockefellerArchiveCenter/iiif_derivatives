@@ -1,0 +1,6 @@
+ArchivesSnake~=0.9
+aws-assume-role-lib~=2.10
+boto3~=1.37
+pillow~=9.5
+requests~=2.32
+shortuuid~=1.0
