@@ -8,7 +8,6 @@ from os import getenv
 from pathlib import Path
 
 import boto3
-import shortuuid
 from aws_assume_role_lib import assume_role
 from PIL import Image
 
@@ -47,8 +46,7 @@ class DerivativeMaker(object):
         try:
             self.send_start_message()
             package_data = self.zodiac_client.get(f'packages/{self.package_id}')
-            as_uri = package_data['identifiers']['archivesspace_archival_object']
-            dimes_id = shortuuid.uuid(name=as_uri)
+            dimes_id = package_data['identifiers']['dimes_object']
             download_path = self.download_package(self.package_id)
             extracted_path = self.extract_package(download_path)
             # self.convert_to_stripped_tiff(extracted_path) # is this necessary?
