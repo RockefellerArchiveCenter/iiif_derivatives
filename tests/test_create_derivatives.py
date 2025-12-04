@@ -58,7 +58,7 @@ class MethodTests(TestCase):
                  mock_create, mock_extract, mock_download, mock_data, mock_start_message):
         mock_data.return_value = {
             'identifiers': {
-                'archivesspace_archival_object': '/repositories/2/archival_objects/1'}}
+                'dimes_object': 'YRa9EbvFzk9qcLdrsEhK6u'}}
         downloaded_path = Path("downloaded")
         mock_download.return_value = downloaded_path
         extracted_path = Path("extracted")
