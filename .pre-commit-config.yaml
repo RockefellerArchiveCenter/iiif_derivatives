@@ -1,0 +1,17 @@
+repos:
+- repo: https://github.com/pre-commit/mirrors-autopep8
+  rev: v2.0.4
+  hooks:
+  - id: autopep8
+    args:
+      - --in-place
+      - --aggressive
+      - --max-line-length=110
+- repo: https://github.com/pycqa/flake8
+  rev: 7.3.0
+  hooks:
+  - id: flake8
+- repo: https://github.com/pycqa/isort
+  rev: 6.0.1
+  hooks:
+  - id: isort
