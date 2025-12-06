@@ -13,6 +13,8 @@ from PIL import Image
 
 from .clients import ZodiacClient
 
+Image.MAX_IMAGE_PIXELS = getenv('MAX_IMAGE_PIXELS')
+
 logging.basicConfig(
     level=int(getenv('LOGGING_LEVEL', logging.INFO)),
     format='%(filename)s::%(funcName)s::%(lineno)s %(message)s')
@@ -49,7 +51,7 @@ class DerivativeMaker(object):
             dimes_id = package_data['identifiers']['dimes_object']
             download_path = self.download_package(self.package_id)
             extracted_path = self.extract_package(download_path)
-            # self.convert_to_stripped_tiff(extracted_path) # is this necessary?
+            self.convert_to_stripped_tiff(extracted_path)
             jp2_dir = self.create_jp2_files(extracted_path, dimes_id)
             self.upload_jp2_files(jp2_dir)
             self.cleanup_successful(self.package_id)
@@ -92,6 +94,19 @@ class DerivativeMaker(object):
         with tarfile.open(archive_path, "r:*") as tf:
             tf.extractall(self.tmp_dir)
         return Path(self.tmp_dir, self.package_id)
+
+    def convert_to_stripped_tiff(self, package_path):
+        """Prepares TIFFs for JPEG2000 processing.
+
+        Args:
+            package_path (pathlib.Path): path of package
+        """
+        tiff_files = package_path.glob('service/*.tif')
+        for tiff in tiff_files:
+            tmp_tiff = tiff.with_stem(f'{tiff.stem}__stripped')
+            cmd = ["tiffcp", "-s", tiff, tmp_tiff]
+            subprocess.run(cmd, check=True)
+            tmp_tiff.rename(tiff)
 
     def get_page_number(self, filename):
         """Parses a page number from a filename.
