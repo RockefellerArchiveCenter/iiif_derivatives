@@ -49,13 +49,14 @@ class MethodTests(TestCase):
     @patch('src.clients.ZodiacClient.get')
     @patch('src.create_derivatives.DerivativeMaker.download_package')
     @patch('src.create_derivatives.DerivativeMaker.extract_package')
+    @patch('src.create_derivatives.DerivativeMaker.convert_to_stripped_tiff')
     @patch('src.create_derivatives.DerivativeMaker.create_jp2_files')
     @patch('src.create_derivatives.DerivativeMaker.upload_jp2_files')
     @patch('src.create_derivatives.DerivativeMaker.cleanup_successful')
     @patch('src.create_derivatives.DerivativeMaker.send_success_message')
     @patch('src.create_derivatives.DerivativeMaker.send_failure_message')
     def test_run(self, mock_failure_message, mock_success_message, mock_cleanup, mock_upload,
-                 mock_create, mock_extract, mock_download, mock_data, mock_start_message):
+                 mock_create, mock_stripped, mock_extract, mock_download, mock_data, mock_start_message):
         mock_data.return_value = {
             'identifiers': {
                 'dimes_object': 'YRa9EbvFzk9qcLdrsEhK6u'}}
@@ -71,6 +72,7 @@ class MethodTests(TestCase):
         mock_cleanup.assert_called_once_with(self.derivative_maker.package_id)
         mock_upload.assert_called_once_with(jp2_dir)
         mock_create.assert_called_once_with(extracted_path, 'YRa9EbvFzk9qcLdrsEhK6u')
+        mock_stripped.assert_called_once()
         mock_extract.assert_called_once_with(downloaded_path)
         mock_download.assert_called_once_with(self.derivative_maker.package_id)
         mock_data.assert_called_once_with(f'packages/{self.derivative_maker.package_id}')
@@ -80,13 +82,14 @@ class MethodTests(TestCase):
     @patch('src.clients.ZodiacClient.get')
     @patch('src.create_derivatives.DerivativeMaker.download_package')
     @patch('src.create_derivatives.DerivativeMaker.extract_package')
+    @patch('src.create_derivatives.DerivativeMaker.convert_to_stripped_tiff')
     @patch('src.create_derivatives.DerivativeMaker.create_jp2_files')
     @patch('src.create_derivatives.DerivativeMaker.upload_jp2_files')
     @patch('src.create_derivatives.DerivativeMaker.cleanup_successful')
     @patch('src.create_derivatives.DerivativeMaker.send_success_message')
     @patch('src.create_derivatives.DerivativeMaker.send_failure_message')
     def test_run_with_exception(self, mock_failure_message, mock_success_message, mock_cleanup,
-                                mock_upload, mock_create, mock_extract, mock_download, mock_data, mock_start_message):
+                                mock_upload, mock_create, mock_stripped, mock_extract, mock_download, mock_data, mock_start_message):
         exception = Exception("foo")
         mock_data.side_effect = exception
         self.derivative_maker.run()
@@ -95,6 +98,7 @@ class MethodTests(TestCase):
         mock_cleanup.assert_not_called()
         mock_upload.assert_not_called()
         mock_create.assert_not_called()
+        mock_stripped.assert_not_called()
         mock_extract.assert_not_called()
         mock_download.assert_not_called()
         mock_start_message.assert_called_once_with()
@@ -122,6 +126,29 @@ class MethodTests(TestCase):
             Path(
                 self.derivative_maker.tmp_dir,
                 self.derivative_maker.package_id))
+
+    def test_convert_to_stripped_tiff(self):
+        Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'service').mkdir(parents=True)
+        shutil.copy(
+            Path('tests', 'fixtures', 'tiff', 'file_example_TIFF_1MB_001.tif'),
+            Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'service'))
+        self.derivative_maker.convert_to_stripped_tiff(
+            Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id))
+        self.assertTrue(
+            Path(
+                self.derivative_maker.tmp_dir,
+                self.derivative_maker.package_id,
+                'service',
+                'file_example_TIFF_1MB_001.tif'
+            ).is_file())
+        self.assertFalse(
+            Path(
+                self.derivative_maker.tmp_dir,
+                self.derivative_maker.package_id,
+                'service',
+                'file_example_TIFF_1MB_001__stripped.tif'
+            ).is_file()
+        )
 
     def test_get_page_number(self):
         for input, expected in [
