@@ -12,6 +12,7 @@ RUN apk add --no-cache \
   musl-dev \
   tiff \
   tiff-dev \
+  tiff-tools \
   zlib-dev
 
 # Download and compile openjpeg
