@@ -125,16 +125,22 @@ class MethodTests(TestCase):
                 self.derivative_maker.package_id))
 
     def test_convert_to_stripped_tiff(self):
-        Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'service').mkdir(parents=True)
+        Path(
+            self.derivative_maker.tmp_dir,
+            self.derivative_maker.package_id,
+            'data',
+            'service').mkdir(
+            parents=True)
         shutil.copy(
             Path('tests', 'fixtures', 'tiff', 'file_example_TIFF_1MB_001.tif'),
-            Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'service'))
+            Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'data', 'service'))
         self.derivative_maker.convert_to_stripped_tiff(
             Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id))
         self.assertTrue(
             Path(
                 self.derivative_maker.tmp_dir,
                 self.derivative_maker.package_id,
+                'data',
                 'service',
                 'file_example_TIFF_1MB_001.tif'
             ).is_file())
@@ -142,6 +148,7 @@ class MethodTests(TestCase):
             Path(
                 self.derivative_maker.tmp_dir,
                 self.derivative_maker.package_id,
+                'data',
                 'service',
                 'file_example_TIFF_1MB_001__stripped.tif'
             ).is_file()
@@ -168,10 +175,15 @@ class MethodTests(TestCase):
         mock_layers.return_value = 4
         mock_page.return_value = '0001'
         dimes_id = '123456789'
-        Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'service').mkdir(parents=True)
+        Path(
+            self.derivative_maker.tmp_dir,
+            self.derivative_maker.package_id,
+            'data',
+            'service').mkdir(
+            parents=True)
         shutil.copy(
             Path('tests', 'fixtures', 'tiff', 'file_example_TIFF_1MB_001.tif'),
-            Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'service'))
+            Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'data', 'service'))
         jp2_dir = self.derivative_maker.create_jp2_files(
             Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id), dimes_id)
         self.assertEqual(jp2_dir, Path(self.derivative_maker.tmp_dir, 'jp2'))

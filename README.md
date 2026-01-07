@@ -22,18 +22,17 @@ This repository is intended to be deployed as an ECS Task in AWS infrastructure.
 
 ## Input and Output Structure
 
-This application expects to receive packages as gzipped tarballs which, when extracted, have the following structure,
-(where `identifier` is a unique identifier for a package):
+This application expects to receive packages as gzipped tarballed Bagit bags which, when extracted, 
+have the following structure, (where `identifier` is a unique identifier for a package) in their payload directory:
 
 ```
-/{identifier}
+{identifier}_001.tif
+{identifier}_002.tif
+{identifier}_003.tif
+/service
     {identifier}_001.tif
     {identifier}_002.tif
     {identifier}_003.tif
-    /service
-        {identifier}_001.tif
-        {identifier}_002.tif
-        {identifier}_003.tif
 ```
 
 It will produce a JPEG2000 file for each TIFF in the `service/` directory:
