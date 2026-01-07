@@ -53,7 +53,7 @@ class DerivativeMaker(object):
             jp2_dir = self.create_jp2_files(extracted_path, dimes_id)
             self.upload_jp2_files(jp2_dir)
             self.cleanup_successful(self.package_id)
-            self.send_success_message()
+            self.send_success_message(package_data)
         except Exception as e:
             self.send_failure_message(e)
 

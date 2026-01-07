@@ -55,9 +55,8 @@ class MethodTests(TestCase):
     @patch('src.create_derivatives.DerivativeMaker.send_failure_message')
     def test_run(self, mock_failure_message, mock_success_message, mock_cleanup, mock_upload,
                  mock_create, mock_stripped, mock_extract, mock_download, mock_data, mock_start_message):
-        mock_data.return_value = {
-            'identifiers': {
-                'dimes_object': 'YRa9EbvFzk9qcLdrsEhK6u'}}
+        package_data = {'identifiers': {'dimes_object': 'YRa9EbvFzk9qcLdrsEhK6u'}}
+        mock_data.return_value = package_data
         downloaded_path = Path("downloaded")
         mock_download.return_value = downloaded_path
         extracted_path = Path("extracted")
@@ -66,7 +65,7 @@ class MethodTests(TestCase):
         mock_create.return_value = jp2_dir
         self.derivative_maker.run()
         mock_failure_message.assert_not_called()
-        mock_success_message.assert_called_once_with()
+        mock_success_message.assert_called_once_with(package_data)
         mock_cleanup.assert_called_once_with(self.derivative_maker.package_id)
         mock_upload.assert_called_once_with(jp2_dir)
         mock_create.assert_called_once_with(extracted_path, 'YRa9EbvFzk9qcLdrsEhK6u')
