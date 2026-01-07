@@ -101,6 +101,7 @@ class DerivativeMaker(object):
         """
         tiff_files = package_path.glob('service/*.tif')
         for tiff in tiff_files:
+            print(f'Converting TIFF file {tiff} to strips')
             tmp_tiff = tiff.with_stem(f'{tiff.stem}__stripped')
             cmd = ["tiffcp", "-s", tiff, tmp_tiff]
             subprocess.run(cmd, check=True)
@@ -168,7 +169,7 @@ class DerivativeMaker(object):
         jp2_dir = Path(self.tmp_dir, 'jp2')
         jp2_dir.mkdir()
         for tiff_file in tiff_files:
-            logging.info(f'Converting TIFF file {tiff_file}')
+            print(f'Converting TIFF file {tiff_file} to JP2')
             page_number = self.get_page_number(str(tiff_file))
             jp2_path = jp2_dir / f'{dimes_id}_{page_number}.jp2'
             layers = self.calculate_layers(tiff_file)
@@ -188,6 +189,7 @@ class DerivativeMaker(object):
         """
         client = self.get_client_with_role('s3', self.aws_role_arn)
         for fp in jp2_dir.iterdir():
+            print(f'uploading {str(fp)} to {fp.name} in {self.destination_bucket}')
             logging.info(f'uploading {str(fp)} to {fp.name} in {self.destination_bucket}')
             client.upload_file(
                 str(fp),
