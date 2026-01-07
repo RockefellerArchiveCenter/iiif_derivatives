@@ -33,4 +33,4 @@ COPY tests tests
 RUN pip install -r tests/test_requirements.txt
 
 FROM base AS build
-CMD [ "python", "src/create_derivatives.py" ]
+CMD [ "python", "-m", "src.create_derivatives" ]
