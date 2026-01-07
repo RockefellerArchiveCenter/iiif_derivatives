@@ -27,7 +27,6 @@ class DerivativeMaker(object):
             package_id,
             aws_region,
             aws_role_arn,
-            ssm_parameter_path,
             zodiac_baseurl,
             tmp_dir,
             source_bucket,
@@ -36,7 +35,6 @@ class DerivativeMaker(object):
         self.package_id = package_id
         self.aws_region = aws_region
         self.aws_role_arn = aws_role_arn
-        self.ssm_parameter_path = ssm_parameter_path
         self.tmp_dir = tmp_dir
         self.source_bucket = source_bucket
         self.destination_bucket = destination_bucket
@@ -302,13 +300,11 @@ if __name__ == '__main__':
     source_bucket = getenv('AWS_SOURCE_BUCKET')
     destination_bucket = getenv('AWS_DESTINATION_BUCKET')
     sns_topic = getenv('AWS_SNS_TOPIC')
-    ssm_parameter_path = f"/{getenv('ENV')}/{getenv('APP_CONFIG_PATH')}"
 
     DerivativeMaker(
         package_id,
         region,
         role_arn,
-        ssm_parameter_path,
         zodiac_baseurl,
         tmp_dir,
         source_bucket,
