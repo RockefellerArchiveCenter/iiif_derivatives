@@ -99,9 +99,7 @@ class DerivativeMaker(object):
         Args:
             package_path (pathlib.Path): path of package
         """
-        for p in package_path.iterdir():
-            print(p)
-        tiff_files = package_path.glob('service/*.tif')
+        tiff_files = package_path.glob('data/service/*.tif')
         for tiff in tiff_files:
             print(f'Converting TIFF file {tiff} to strips')
             tmp_tiff = tiff.with_stem(f'{tiff.stem}__stripped')
@@ -167,11 +165,9 @@ class DerivativeMaker(object):
                            "-c", "[256,256],[256,256],[128,128]",
                            "-b", "64,64",
                            "-p", "RPCL"]
-        tiff_files = package_path.glob('service/*.tif')
+        tiff_files = package_path.glob('data/service/*.tif')
         jp2_dir = Path(self.tmp_dir, 'jp2')
         jp2_dir.mkdir()
-        for p in package_path.iterdir():
-            print(p)
         for tiff_file in tiff_files:
             print(f'Converting TIFF file {tiff_file} to JP2')
             page_number = self.get_page_number(str(tiff_file))
