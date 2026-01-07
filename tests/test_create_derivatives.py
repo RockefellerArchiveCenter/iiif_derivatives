@@ -14,7 +14,6 @@ from src.create_derivatives import DerivativeMaker
 DEFAULT_ARGS = ['0edb4066-980c-491f-bd73-c80a6546ff6d',
                 'us-east-1',
                 'arn:aws:iam::123456789012:role/iiif-derivatives-role',
-                '/dev/iiif-manifest',
                 'https://zodiac-backend.dev.rockarch.org',
                 '/ebs',
                 'rac-dev-pictor-upload',
@@ -28,15 +27,14 @@ class InitTests(TestCase):
     def test_init(self, mock_zodiac):
         mock_zodiac.return_value = None
         derivative_maker = DerivativeMaker(*DEFAULT_ARGS)
-        mock_zodiac.assert_called_once_with(DEFAULT_ARGS[4])
+        mock_zodiac.assert_called_once_with(DEFAULT_ARGS[3])
         self.assertEqual(derivative_maker.package_id, DEFAULT_ARGS[0])
         self.assertEqual(derivative_maker.aws_region, DEFAULT_ARGS[1])
         self.assertEqual(derivative_maker.aws_role_arn, DEFAULT_ARGS[2])
-        self.assertEqual(derivative_maker.ssm_parameter_path, DEFAULT_ARGS[3])
-        self.assertEqual(derivative_maker.tmp_dir, DEFAULT_ARGS[5])
-        self.assertEqual(derivative_maker.source_bucket, DEFAULT_ARGS[6])
-        self.assertEqual(derivative_maker.destination_bucket, DEFAULT_ARGS[7])
-        self.assertEqual(derivative_maker.sns_topic, DEFAULT_ARGS[8])
+        self.assertEqual(derivative_maker.tmp_dir, DEFAULT_ARGS[4])
+        self.assertEqual(derivative_maker.source_bucket, DEFAULT_ARGS[5])
+        self.assertEqual(derivative_maker.destination_bucket, DEFAULT_ARGS[6])
+        self.assertEqual(derivative_maker.sns_topic, DEFAULT_ARGS[7])
 
 
 class MethodTests(TestCase):
