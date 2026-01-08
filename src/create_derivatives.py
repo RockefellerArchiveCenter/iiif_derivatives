@@ -101,11 +101,15 @@ class DerivativeMaker(object):
         """
         tiff_files = package_path.glob('data/service/*.tif')
         for tiff in tiff_files:
+            with Image.open(tiff) as img:
+                print(img)
             print(f'Converting TIFF file {tiff} to strips')
             tmp_tiff = tiff.with_stem(f'{tiff.stem}__stripped')
             cmd = ["tiffcp", "-s", tiff, tmp_tiff]
             subprocess.run(cmd, check=True)
             tmp_tiff.rename(tiff)
+            with Image.open(tiff) as img:
+                print(img)
 
     def get_page_number(self, filename):
         """Parses a page number from a filename.
