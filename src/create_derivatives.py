@@ -13,7 +13,7 @@ from PIL import Image
 
 from .clients import ZodiacClient
 
-Image.MAX_IMAGE_PIXELS = getenv('MAX_IMAGE_PIXELS')
+Image.MAX_IMAGE_PIXELS = int(getenv('MAX_IMAGE_PIXELS'))
 
 logging.basicConfig(
     level=int(getenv('LOGGING_LEVEL', logging.INFO)),
@@ -53,8 +53,10 @@ class DerivativeMaker(object):
             jp2_dir = self.create_jp2_files(extracted_path, dimes_id)
             self.upload_jp2_files(jp2_dir)
             self.cleanup_successful(self.package_id)
-            self.send_success_message()
+            self.send_success_message(package_data)
+            logging.info(f"Successfully created derivatives for package {self.package_id}")
         except Exception as e:
+            logging.error(e)
             self.send_failure_message(e)
 
     def get_client_with_role(self, resource, role_arn):
@@ -99,7 +101,7 @@ class DerivativeMaker(object):
         Args:
             package_path (pathlib.Path): path of package
         """
-        tiff_files = package_path.glob('service/*.tif')
+        tiff_files = package_path.rglob('data/service/*.tif')
         for tiff in tiff_files:
             tmp_tiff = tiff.with_stem(f'{tiff.stem}__stripped')
             cmd = ["tiffcp", "-s", tiff, tmp_tiff]
@@ -128,20 +130,20 @@ class DerivativeMaker(object):
             filename_trimmed = base_filename
         return filename_trimmed.split("_")[-1].lstrip("0").zfill(4)
 
-    def calculate_layers(self, file):
+    def calculate_layers(self, fp):
         """Calculates the number of layers based on pixel dimensions.
         For TIFF files, image tag 256 is the width, and 257 is the height.
 
         Args:
-            file (str): filename of a TIFF image file.
+            fp (str): filename of a TIFF image file.
         Returns:
             layers (int): number of layers to convert to
         """
-
-        with Image.open(file) as img:
+        with Image.open(fp) as img:
             width = [w for w in img.tag[256]][0]
             height = [h for h in img.tag[257]][0]
-        return math.ceil((math.log(max(width, height)) / math.log(2)) - ((math.log(96) / math.log(2)))) + 1
+        return math.ceil(
+            (math.log(max(width, height)) / math.log(2)) - ((math.log(96) / math.log(2)))) + 1
 
     def create_jp2_files(self, package_path, dimes_id):
         """Creates JPEG2000 files from TIFF files.
@@ -164,7 +166,7 @@ class DerivativeMaker(object):
                            "-c", "[256,256],[256,256],[128,128]",
                            "-b", "64,64",
                            "-p", "RPCL"]
-        tiff_files = package_path.glob('service/*.tif')
+        tiff_files = package_path.rglob('data/service/*.tif')
         jp2_dir = Path(self.tmp_dir, 'jp2')
         jp2_dir.mkdir()
         for tiff_file in tiff_files:
@@ -187,10 +189,11 @@ class DerivativeMaker(object):
         """
         client = self.get_client_with_role('s3', self.aws_role_arn)
         for fp in jp2_dir.iterdir():
+            logging.info(f'uploading {str(fp)} to {fp.name} in {self.destination_bucket}')
             client.upload_file(
                 str(fp),
                 self.destination_bucket,
-                f'images/{fp.name}')
+                f'images/{fp.stem}')
 
     def cleanup_successful(self, package_id):
         """Removes package from source bucket.

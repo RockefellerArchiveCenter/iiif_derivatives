@@ -55,9 +55,8 @@ class MethodTests(TestCase):
     @patch('src.create_derivatives.DerivativeMaker.send_failure_message')
     def test_run(self, mock_failure_message, mock_success_message, mock_cleanup, mock_upload,
                  mock_create, mock_stripped, mock_extract, mock_download, mock_data, mock_start_message):
-        mock_data.return_value = {
-            'identifiers': {
-                'dimes_object': 'YRa9EbvFzk9qcLdrsEhK6u'}}
+        package_data = {'identifiers': {'dimes_object': 'YRa9EbvFzk9qcLdrsEhK6u'}}
+        mock_data.return_value = package_data
         downloaded_path = Path("downloaded")
         mock_download.return_value = downloaded_path
         extracted_path = Path("extracted")
@@ -66,7 +65,7 @@ class MethodTests(TestCase):
         mock_create.return_value = jp2_dir
         self.derivative_maker.run()
         mock_failure_message.assert_not_called()
-        mock_success_message.assert_called_once_with()
+        mock_success_message.assert_called_once_with(package_data)
         mock_cleanup.assert_called_once_with(self.derivative_maker.package_id)
         mock_upload.assert_called_once_with(jp2_dir)
         mock_create.assert_called_once_with(extracted_path, 'YRa9EbvFzk9qcLdrsEhK6u')
@@ -126,16 +125,22 @@ class MethodTests(TestCase):
                 self.derivative_maker.package_id))
 
     def test_convert_to_stripped_tiff(self):
-        Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'service').mkdir(parents=True)
+        Path(
+            self.derivative_maker.tmp_dir,
+            self.derivative_maker.package_id,
+            'data',
+            'service').mkdir(
+            parents=True)
         shutil.copy(
             Path('tests', 'fixtures', 'tiff', 'file_example_TIFF_1MB_001.tif'),
-            Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'service'))
+            Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'data', 'service'))
         self.derivative_maker.convert_to_stripped_tiff(
             Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id))
         self.assertTrue(
             Path(
                 self.derivative_maker.tmp_dir,
                 self.derivative_maker.package_id,
+                'data',
                 'service',
                 'file_example_TIFF_1MB_001.tif'
             ).is_file())
@@ -143,6 +148,7 @@ class MethodTests(TestCase):
             Path(
                 self.derivative_maker.tmp_dir,
                 self.derivative_maker.package_id,
+                'data',
                 'service',
                 'file_example_TIFF_1MB_001__stripped.tif'
             ).is_file()
@@ -169,10 +175,15 @@ class MethodTests(TestCase):
         mock_layers.return_value = 4
         mock_page.return_value = '0001'
         dimes_id = '123456789'
-        Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'service').mkdir(parents=True)
+        Path(
+            self.derivative_maker.tmp_dir,
+            self.derivative_maker.package_id,
+            'data',
+            'service').mkdir(
+            parents=True)
         shutil.copy(
             Path('tests', 'fixtures', 'tiff', 'file_example_TIFF_1MB_001.tif'),
-            Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'service'))
+            Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'data', 'service'))
         jp2_dir = self.derivative_maker.create_jp2_files(
             Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id), dimes_id)
         self.assertEqual(jp2_dir, Path(self.derivative_maker.tmp_dir, 'jp2'))
@@ -186,10 +197,10 @@ class MethodTests(TestCase):
         uploaded_files = s3.list_objects_v2(Bucket=self.derivative_maker.destination_bucket)['Contents']
         uploaded_keys = [u['Key'] for u in uploaded_files]
         self.assertEqual(uploaded_keys,
-                         ['images/sample.jp2',
-                          'images/sample_2.jp2',
-                          'images/sample_3.jp2',
-                          'images/sample_4.jp2'])
+                         ['images/sample',
+                          'images/sample_2',
+                          'images/sample_3',
+                          'images/sample_4'])
 
     @mock_aws
     def test_cleanup_successful(self):
