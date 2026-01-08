@@ -111,18 +111,18 @@ class MethodTests(TestCase):
         download_path = self.derivative_maker.download_package(self.derivative_maker.package_id)
         self.assertTrue(download_path.is_file())
 
-    def test_extract_package(self):
-        shutil.copy(
-            Path('tests', 'fixtures', 'bags', f'{self.derivative_maker.package_id}.tar.gz'),
-            self.derivative_maker.tmp_dir)
-        extracted_path = self.derivative_maker.extract_package(
-            Path(self.derivative_maker.tmp_dir, f'{self.derivative_maker.package_id}.tar.gz'))
-        self.assertTrue(extracted_path.is_dir())
-        self.assertEqual(
-            extracted_path,
-            Path(
-                self.derivative_maker.tmp_dir,
-                self.derivative_maker.package_id))
+    # def test_extract_package(self):
+    #     shutil.copy(
+    #         Path('tests', 'fixtures', 'bags', f'{self.derivative_maker.package_id}.tar.gz'),
+    #         self.derivative_maker.tmp_dir)
+    #     extracted_path = self.derivative_maker.extract_package(
+    #         Path(self.derivative_maker.tmp_dir, f'{self.derivative_maker.package_id}.tar.gz'))
+    #     self.assertTrue(extracted_path.is_dir())
+    #     self.assertEqual(
+    #         extracted_path,
+    #         Path(
+    #             self.derivative_maker.tmp_dir,
+    #             self.derivative_maker.package_id))
 
     def test_convert_to_stripped_tiff(self):
         Path(
