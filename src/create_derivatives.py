@@ -90,10 +90,10 @@ class DerivativeMaker(object):
             extracted_path (pathlib.Path): Location of extracted package.
         """
         with tarfile.open(archive_path, "r:*") as tf:
-            tf.extractall(self.tmp_dir)
-        for p in Path(self.tmp_dir).rglob("*"):
+            tf.extractall('.')
+        for p in Path('.').rglob("*"):
             print(p)
-        return Path(self.tmp_dir, self.package_id)
+        return Path('.', self.package_id)
 
     def convert_to_stripped_tiff(self, package_path):
         """Prepares TIFFs for JPEG2000 processing.
