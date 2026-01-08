@@ -54,6 +54,7 @@ class DerivativeMaker(object):
             self.upload_jp2_files(jp2_dir)
             self.cleanup_successful(self.package_id)
             self.send_success_message(package_data)
+            logging.info(f"Successfully created derivatives for package {self.package_id}")
         except Exception as e:
             logging.error(e)
             self.send_failure_message(e)
@@ -100,14 +101,12 @@ class DerivativeMaker(object):
         Args:
             package_path (pathlib.Path): path of package
         """
-        tiff_dir = package_path / 'data' / 'service'
-        for tiff in tiff_dir.iterdir():
-            if tiff.suffix == '.tif':
-                print(f"converting  to strips {tiff}")
-                tmp_tiff = tiff.with_stem(f'{tiff.stem}__stripped')
-                cmd = ["tiffcp", "-s", tiff, tmp_tiff]
-                subprocess.run(cmd, check=True)
-                tmp_tiff.rename(tiff)
+        tiff_files = package_path.rglob('data/service/*.tif')
+        for tiff in tiff_files:
+            tmp_tiff = tiff.with_stem(f'{tiff.stem}__stripped')
+            cmd = ["tiffcp", "-s", tiff, tmp_tiff]
+            subprocess.run(cmd, check=True)
+            tmp_tiff.rename(tiff)
 
     def get_page_number(self, filename):
         """Parses a page number from a filename.
@@ -140,19 +139,11 @@ class DerivativeMaker(object):
         Returns:
             layers (int): number of layers to convert to
         """
-        try:
-            with Image.open(fp) as img:
-                width = [w for w in img.tag[256]][0]
-                height = [h for h in img.tag[257]][0]
-            return math.ceil(
-                (math.log(max(width, height)) / math.log(2)) - ((math.log(96) / math.log(2)))) + 1
-        except Exception:
-            client = self.get_client_with_role('s3', self.aws_role_arn)
-            client.upload_file(
-                str(fp),
-                self.destination_bucket,
-                fp.name)
-            raise
+        with Image.open(fp) as img:
+            width = [w for w in img.tag[256]][0]
+            height = [h for h in img.tag[257]][0]
+        return math.ceil(
+            (math.log(max(width, height)) / math.log(2)) - ((math.log(96) / math.log(2)))) + 1
 
     def create_jp2_files(self, package_path, dimes_id):
         """Creates JPEG2000 files from TIFF files.
@@ -175,21 +166,19 @@ class DerivativeMaker(object):
                            "-c", "[256,256],[256,256],[128,128]",
                            "-b", "64,64",
                            "-p", "RPCL"]
-        tiff_dir = package_path / 'data' / 'service'
+        tiff_files = package_path.rglob('data/service/*.tif')
         jp2_dir = Path(self.tmp_dir, 'jp2')
         jp2_dir.mkdir()
-        for tiff_file in tiff_dir.iterdir():
-            if tiff_file.suffix == '.tif':
-                print(f"converting to JP2: {tiff_file}")
-                page_number = self.get_page_number(str(tiff_file))
-                jp2_path = jp2_dir / f'{dimes_id}_{page_number}.jp2'
-                layers = self.calculate_layers(tiff_file)
-                cmd = ['opj_compress',
-                       "-i", str(tiff_file),
-                       "-o", str(jp2_path),
-                       "-n", str(layers),
-                       "-SOP"] + default_options
-                subprocess.run(cmd, check=True)
+        for tiff_file in tiff_files:
+            page_number = self.get_page_number(str(tiff_file))
+            jp2_path = jp2_dir / f'{dimes_id}_{page_number}.jp2'
+            layers = self.calculate_layers(tiff_file)
+            cmd = ['opj_compress',
+                   "-i", str(tiff_file),
+                   "-o", str(jp2_path),
+                   "-n", str(layers),
+                   "-SOP"] + default_options
+            subprocess.run(cmd, check=True)
         return jp2_dir
 
     def upload_jp2_files(self, jp2_dir):
@@ -204,7 +193,7 @@ class DerivativeMaker(object):
             client.upload_file(
                 str(fp),
                 self.destination_bucket,
-                f'images/{fp.name}')
+                f'images/{fp.stem}')
 
     def cleanup_successful(self, package_id):
         """Removes package from source bucket.

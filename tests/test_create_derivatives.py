@@ -197,10 +197,10 @@ class MethodTests(TestCase):
         uploaded_files = s3.list_objects_v2(Bucket=self.derivative_maker.destination_bucket)['Contents']
         uploaded_keys = [u['Key'] for u in uploaded_files]
         self.assertEqual(uploaded_keys,
-                         ['images/sample.jp2',
-                          'images/sample_2.jp2',
-                          'images/sample_3.jp2',
-                          'images/sample_4.jp2'])
+                         ['images/sample',
+                          'images/sample_2',
+                          'images/sample_3',
+                          'images/sample_4'])
 
     @mock_aws
     def test_cleanup_successful(self):
