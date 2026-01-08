@@ -13,7 +13,7 @@ from PIL import Image
 
 from .clients import ZodiacClient
 
-Image.MAX_IMAGE_PIXELS = getenv('MAX_IMAGE_PIXELS')
+Image.MAX_IMAGE_PIXELS = int(getenv('MAX_IMAGE_PIXELS'))
 
 logging.basicConfig(
     level=int(getenv('LOGGING_LEVEL', logging.INFO)),
