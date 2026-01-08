@@ -92,8 +92,6 @@ class DerivativeMaker(object):
         """
         with tarfile.open(archive_path, "r:*") as tf:
             tf.extractall(self.tmp_dir)
-        for p in Path(self.tmp_dir).rglob("*"):
-            print(p)
         return Path(self.tmp_dir, self.package_id)
 
     def convert_to_stripped_tiff(self, package_path):
@@ -105,7 +103,7 @@ class DerivativeMaker(object):
         tiff_dir = package_path / 'data' / 'service'
         for tiff in tiff_dir.iterdir():
             if tiff.suffix == '.tif':
-                print(tiff)
+                print(f"converting  to strips {tiff}")
                 tmp_tiff = tiff.with_stem(f'{tiff.stem}__stripped')
                 cmd = ["tiffcp", "-s", tiff, tmp_tiff]
                 subprocess.run(cmd, check=True)
@@ -182,6 +180,7 @@ class DerivativeMaker(object):
         jp2_dir.mkdir()
         for tiff_file in tiff_dir.iterdir():
             if tiff_file.suffix == '.tif':
+                print(f"converting to JP2: {tiff_file}")
                 page_number = self.get_page_number(str(tiff_file))
                 jp2_path = jp2_dir / f'{dimes_id}_{page_number}.jp2'
                 layers = self.calculate_layers(tiff_file)
