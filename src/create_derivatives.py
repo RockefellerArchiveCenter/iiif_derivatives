@@ -150,7 +150,7 @@ class DerivativeMaker(object):
             client = self.get_client_with_role('s3', self.aws_role_arn)
             client.upload_file(
                 str(fp),
-                self.source_bucket,
+                self.destination_bucket,
                 fp.name)
             raise
 
