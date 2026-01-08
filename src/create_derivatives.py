@@ -131,24 +131,27 @@ class DerivativeMaker(object):
             filename_trimmed = base_filename
         return filename_trimmed.split("_")[-1].lstrip("0").zfill(4)
 
-    def calculate_layers(self, file):
+    def calculate_layers(self, fp):
         """Calculates the number of layers based on pixel dimensions.
         For TIFF files, image tag 256 is the width, and 257 is the height.
 
         Args:
-            file (str): filename of a TIFF image file.
+            fp (str): filename of a TIFF image file.
         Returns:
             layers (int): number of layers to convert to
         """
         try:
-            with Image.open(file) as img:
+            with Image.open(fp) as img:
                 width = [w for w in img.tag[256]][0]
                 height = [h for h in img.tag[257]][0]
             return math.ceil(
                 (math.log(max(width, height)) / math.log(2)) - ((math.log(96) / math.log(2)))) + 1
         except Exception:
-            with open(file, 'rb') as f:
-                print(f.read(20))
+            client = self.get_client_with_role('s3', self.aws_role_arn)
+            client.upload_file(
+                str(fp),
+                self.source_bucket,
+                fp.name)
             raise
 
     def create_jp2_files(self, package_path, dimes_id):
