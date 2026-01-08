@@ -91,6 +91,8 @@ class DerivativeMaker(object):
         """
         with tarfile.open(archive_path, "r:*") as tf:
             tf.extractall(self.tmp_dir)
+        for p in Path(self.tmp_dir).rglob("*"):
+            print(p)
         return Path(self.tmp_dir, self.package_id)
 
     def convert_to_stripped_tiff(self, package_path):
@@ -101,15 +103,11 @@ class DerivativeMaker(object):
         """
         tiff_files = package_path.glob('data/service/*.tif')
         for tiff in tiff_files:
-            with Image.open(tiff) as img:
-                print(img)
-            print(f'Converting TIFF file {tiff} to strips')
+            print(tiff)
             tmp_tiff = tiff.with_stem(f'{tiff.stem}__stripped')
             cmd = ["tiffcp", "-s", tiff, tmp_tiff]
             subprocess.run(cmd, check=True)
             tmp_tiff.rename(tiff)
-            with Image.open(tiff) as img:
-                print(img)
 
     def get_page_number(self, filename):
         """Parses a page number from a filename.
@@ -142,11 +140,16 @@ class DerivativeMaker(object):
         Returns:
             layers (int): number of layers to convert to
         """
-
-        with Image.open(file) as img:
-            width = [w for w in img.tag[256]][0]
-            height = [h for h in img.tag[257]][0]
-        return math.ceil((math.log(max(width, height)) / math.log(2)) - ((math.log(96) / math.log(2)))) + 1
+        try:
+            with Image.open(file) as img:
+                width = [w for w in img.tag[256]][0]
+                height = [h for h in img.tag[257]][0]
+            return math.ceil(
+                (math.log(max(width, height)) / math.log(2)) - ((math.log(96) / math.log(2)))) + 1
+        except Exception:
+            with open(file, 'rb') as f:
+                print(f.read(20))
+            raise
 
     def create_jp2_files(self, package_path, dimes_id):
         """Creates JPEG2000 files from TIFF files.
@@ -173,7 +176,6 @@ class DerivativeMaker(object):
         jp2_dir = Path(self.tmp_dir, 'jp2')
         jp2_dir.mkdir()
         for tiff_file in tiff_files:
-            print(f'Converting TIFF file {tiff_file} to JP2')
             page_number = self.get_page_number(str(tiff_file))
             jp2_path = jp2_dir / f'{dimes_id}_{page_number}.jp2'
             layers = self.calculate_layers(tiff_file)
@@ -193,7 +195,6 @@ class DerivativeMaker(object):
         """
         client = self.get_client_with_role('s3', self.aws_role_arn)
         for fp in jp2_dir.iterdir():
-            print(f'uploading {str(fp)} to {fp.name} in {self.destination_bucket}')
             logging.info(f'uploading {str(fp)} to {fp.name} in {self.destination_bucket}')
             client.upload_file(
                 str(fp),
