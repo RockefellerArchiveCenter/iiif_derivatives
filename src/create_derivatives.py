@@ -55,6 +55,7 @@ class DerivativeMaker(object):
             self.cleanup_successful(self.package_id)
             self.send_success_message(package_data)
         except Exception as e:
+            logging.error(e)
             self.send_failure_message(e)
 
     def get_client_with_role(self, resource, role_arn):
