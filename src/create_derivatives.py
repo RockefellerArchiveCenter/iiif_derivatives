@@ -55,6 +55,7 @@ class DerivativeMaker(object):
             self.cleanup_successful(self.package_id)
             self.send_success_message(package_data)
         except Exception as e:
+            logging.error(e)
             self.send_failure_message(e)
 
     def get_client_with_role(self, resource, role_arn):
@@ -101,13 +102,14 @@ class DerivativeMaker(object):
         Args:
             package_path (pathlib.Path): path of package
         """
-        tiff_files = package_path.glob('data/service/*.tif')
-        for tiff in tiff_files:
-            print(tiff)
-            tmp_tiff = tiff.with_stem(f'{tiff.stem}__stripped')
-            cmd = ["tiffcp", "-s", tiff, tmp_tiff]
-            subprocess.run(cmd, check=True)
-            tmp_tiff.rename(tiff)
+        tiff_dir = package_path / 'data' / 'service'
+        for tiff in tiff_dir.iterdir():
+            if tiff.suffix == '.tif':
+                print(tiff)
+                tmp_tiff = tiff.with_stem(f'{tiff.stem}__stripped')
+                cmd = ["tiffcp", "-s", tiff, tmp_tiff]
+                subprocess.run(cmd, check=True)
+                tmp_tiff.rename(tiff)
 
     def get_page_number(self, filename):
         """Parses a page number from a filename.
@@ -175,19 +177,20 @@ class DerivativeMaker(object):
                            "-c", "[256,256],[256,256],[128,128]",
                            "-b", "64,64",
                            "-p", "RPCL"]
-        tiff_files = package_path.glob('data/service/*.tif')
+        tiff_dir = package_path / 'data' / 'service'
         jp2_dir = Path(self.tmp_dir, 'jp2')
         jp2_dir.mkdir()
-        for tiff_file in tiff_files:
-            page_number = self.get_page_number(str(tiff_file))
-            jp2_path = jp2_dir / f'{dimes_id}_{page_number}.jp2'
-            layers = self.calculate_layers(tiff_file)
-            cmd = ['opj_compress',
-                   "-i", str(tiff_file),
-                   "-o", str(jp2_path),
-                   "-n", str(layers),
-                   "-SOP"] + default_options
-            subprocess.run(cmd, check=True)
+        for tiff_file in tiff_dir.iterdir():
+            if tiff_file.suffix == '.tif':
+                page_number = self.get_page_number(str(tiff_file))
+                jp2_path = jp2_dir / f'{dimes_id}_{page_number}.jp2'
+                layers = self.calculate_layers(tiff_file)
+                cmd = ['opj_compress',
+                       "-i", str(tiff_file),
+                       "-o", str(jp2_path),
+                       "-n", str(layers),
+                       "-SOP"] + default_options
+                subprocess.run(cmd, check=True)
         return jp2_dir
 
     def upload_jp2_files(self, jp2_dir):
