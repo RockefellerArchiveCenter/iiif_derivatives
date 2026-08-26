@@ -65,6 +65,22 @@ class DerivativeMaker(object):
         assumed_role_session = assume_role(session, role_arn)
         return assumed_role_session.client(resource)
 
+    def get_tiff_files(self, package_path):
+        """Gets list of TIFF files to be used as derivative source.
+
+        This logic accounts for packages which do not have TIFFs in a `service` directory.
+
+        Args:
+            package_path (pathlib.Path): Path of package root.
+
+        Returns:
+            (list of pathlib.Path instances): List of TIFF files to use as derivative source.
+        """
+        if (package_path / 'data' / 'service').is_dir():
+            return package_path.rglob('data/service/*.tif')
+        else:
+            return package_path.rglob('data/*.tif')
+
     def download_package(self, package_id):
         """Downloads package from S3 bucket.
 
@@ -101,7 +117,7 @@ class DerivativeMaker(object):
         Args:
             package_path (pathlib.Path): path of package
         """
-        tiff_files = package_path.rglob('data/service/*.tif')
+        tiff_files = self.get_tiff_files(package_path)
         for tiff in tiff_files:
             tmp_tiff = tiff.with_stem(f'{tiff.stem}__stripped')
             cmd = ["tiffcp", "-s", tiff, tmp_tiff]
@@ -166,7 +182,7 @@ class DerivativeMaker(object):
                            "-c", "[256,256],[256,256],[128,128]",
                            "-b", "64,64",
                            "-p", "RPCL"]
-        tiff_files = package_path.rglob('data/service/*.tif')
+        tiff_files = self.get_tiff_files(package_path)
         jp2_dir = Path(self.tmp_dir, 'jp2')
         jp2_dir.mkdir()
         for tiff_file in tiff_files:
@@ -182,7 +198,7 @@ class DerivativeMaker(object):
         return jp2_dir
 
     def upload_jp2_files(self, jp2_dir):
-        """Uploads JPEG 2000 files to destnation.
+        """Uploads JPEG 2000 files to destination.
 
         Args:
             jp2_dir (pathlib.Path): Directory containing JPEG2000 files.
