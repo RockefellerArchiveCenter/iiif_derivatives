@@ -100,6 +100,39 @@ class MethodTests(TestCase):
         mock_download.assert_not_called()
         mock_start_message.assert_called_once_with()
 
+    def test_get_tiff_files(self):
+        Path(
+            self.derivative_maker.tmp_dir,
+            self.derivative_maker.package_id,
+            'data',
+            'service').mkdir(parents=True)
+        shutil.copy(
+            Path('tests', 'fixtures', 'tiff', 'file_example_TIFF_1MB_001.tif'),
+            Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'data', 'service'))
+        output = self.derivative_maker.get_tiff_files(
+            Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id))
+        output_list = list(output)
+        self.assertEqual(len(output_list), 1)
+        self.assertEqual(
+            str(output_list[0]),
+            '/ebs/0edb4066-980c-491f-bd73-c80a6546ff6d/data/service/file_example_TIFF_1MB_001.tif')
+
+    def test_get_tiff_files_no_service_dir(self):
+        Path(
+            self.derivative_maker.tmp_dir,
+            self.derivative_maker.package_id,
+            'data').mkdir(parents=True)
+        shutil.copy(
+            Path('tests', 'fixtures', 'tiff', 'file_example_TIFF_1MB_001.tif'),
+            Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id, 'data'))
+        output = self.derivative_maker.get_tiff_files(
+            Path(self.derivative_maker.tmp_dir, self.derivative_maker.package_id))
+        output_list = list(output)
+        self.assertEqual(len(output_list), 1)
+        self.assertEqual(
+            str(output_list[0]),
+            '/ebs/0edb4066-980c-491f-bd73-c80a6546ff6d/data/file_example_TIFF_1MB_001.tif')
+
     @mock_aws
     def test_download_package(self):
         s3 = boto3.client('s3', region_name='us-east-1')
