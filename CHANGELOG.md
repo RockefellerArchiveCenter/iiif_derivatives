@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/RockefellerArchiveCenter/iiif_derivatives/compare/v1.0.2...v1.1.0) (2026-08-26)
+
+
+### Features
+
+* handle packages without `service` directory ([641b10b](https://github.com/RockefellerArchiveCenter/iiif_derivatives/commit/641b10bf040f5064bd830289b275d84007c970dd))
+* handle packages without `service` directory ([d519973](https://github.com/RockefellerArchiveCenter/iiif_derivatives/commit/d5199735aeac9408879b6e212c476c31d8b6424e))
+
 ## [1.0.2](https://github.com/RockefellerArchiveCenter/iiif_derivatives/compare/v1.0.1...v1.0.2) (2026-08-03)
 
 
