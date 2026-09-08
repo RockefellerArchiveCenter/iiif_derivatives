@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.1](https://github.com/RockefellerArchiveCenter/iiif_derivatives/compare/v1.1.0...v1.1.1) (2026-09-08)
+
+
+### Bug Fixes
+
+* **deps:** Scheduled dependency updates ([681d7fa](https://github.com/RockefellerArchiveCenter/iiif_derivatives/commit/681d7fa7b94f7e5f4542db47aece643e10fbc8be))
+* **deps:** Scheduled dependency updates ([681d7fa](https://github.com/RockefellerArchiveCenter/iiif_derivatives/commit/681d7fa7b94f7e5f4542db47aece643e10fbc8be))
+* **deps:** Scheduled dependency updates ([f0fce6c](https://github.com/RockefellerArchiveCenter/iiif_derivatives/commit/f0fce6c60e360fe1affc7b58f981640fd25fe6cb))
+* **deps:** Scheduled dependency updates ([f0fce6c](https://github.com/RockefellerArchiveCenter/iiif_derivatives/commit/f0fce6c60e360fe1affc7b58f981640fd25fe6cb))
+* **deps:** Scheduled dependency updates ([fb41f10](https://github.com/RockefellerArchiveCenter/iiif_derivatives/commit/fb41f10db2478b431752a936b62349c19a2cabd5))
+
 ## [1.1.0](https://github.com/RockefellerArchiveCenter/iiif_derivatives/compare/v1.0.2...v1.1.0) (2026-08-26)
 
 
