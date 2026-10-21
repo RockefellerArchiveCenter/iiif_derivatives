@@ -23,7 +23,8 @@ RUN cmake . && make && make install
 
 WORKDIR /code
 COPY requirements.txt .
-RUN pip install -r requirements.txt
+RUN python -m pip install --upgrade "pip>=26.2.2" && \
+    python -m pip install -r requirements.txt
 
 COPY src src
 
