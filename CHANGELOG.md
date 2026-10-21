@@ -1,5 +1,16 @@
 # Changelog
 
+## [1.1.3](https://github.com/RockefellerArchiveCenter/iiif_derivatives/compare/v1.1.2...v1.1.3) (2026-10-21)
+
+
+### Bug Fixes
+
+* update pip ([24465db](https://github.com/RockefellerArchiveCenter/iiif_derivatives/commit/24465dbaa9c4c0e0cb3f28f291d5f6d5bfd62830))
+* update pip ([24465db](https://github.com/RockefellerArchiveCenter/iiif_derivatives/commit/24465dbaa9c4c0e0cb3f28f291d5f6d5bfd62830))
+* update pip ([d22a54e](https://github.com/RockefellerArchiveCenter/iiif_derivatives/commit/d22a54e5c6ceb866943bbe191a3a825bc72f7233))
+* update pip ([d22a54e](https://github.com/RockefellerArchiveCenter/iiif_derivatives/commit/d22a54e5c6ceb866943bbe191a3a825bc72f7233))
+* update pip ([3d31157](https://github.com/RockefellerArchiveCenter/iiif_derivatives/commit/3d311570075c599cef1dde4069273e0553f052b6))
+
 ## [1.1.2](https://github.com/RockefellerArchiveCenter/iiif_derivatives/compare/v1.1.1...v1.1.2) (2026-10-05)
 
 
