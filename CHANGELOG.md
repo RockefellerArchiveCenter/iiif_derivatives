@@ -1,5 +1,14 @@
 # Changelog
 
+## [1.1.5](https://github.com/RockefellerArchiveCenter/iiif_derivatives/compare/v1.1.4...v1.1.5) (2026-11-19)
+
+
+### Bug Fixes
+
+* update deploy ([3639a13](https://github.com/RockefellerArchiveCenter/iiif_derivatives/commit/3639a130bbc294536b076f4e385ed3400e1cbf43))
+* update deploy ([e414eee](https://github.com/RockefellerArchiveCenter/iiif_derivatives/commit/e414eee099e83bc6ca111b2d4e7eae6519e631de))
+* update deploy ([884941a](https://github.com/RockefellerArchiveCenter/iiif_derivatives/commit/884941ab5bf8b6f231f094322cbba690630d1a2a))
+
 ## [1.1.4](https://github.com/RockefellerArchiveCenter/iiif_derivatives/compare/v1.1.3...v1.1.4) (2026-11-02)
 
 
